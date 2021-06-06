@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Urban Homework</string>
+    <string name="txt_character_detail_title">Character Details</string>
+    <string name="txt_location_label">Location</string>
+    <string name="txt_name_label">Name: %s</string>
+    <string name="txt_status_label">Status: %s</string>
+    <string name="txt_species_label">Species: %s</string>
+    <string name="txt_gender_label">Gender: %s</string>
+    <string name="txt_type_label">Type: %s</string>
+    <string name="txt_dimension_label">Dimension: %s</string>
+</resources>

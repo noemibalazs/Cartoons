@@ -1,9 +1,14 @@
 package com.urban.androidhomework.landing
 
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.PersistableBundle
 import android.util.Log
+import android.view.View
+import android.widget.DatePicker
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -14,12 +19,14 @@ import com.urban.androidhomework.adapter.adapter.CharactersAdapter
 import com.urban.androidhomework.api.model.CharacterData
 import com.urban.androidhomework.app.UrbanHomeWorkApp
 import com.urban.androidhomework.details.CharacterDetailActivity
+import com.urban.androidhomework.mapper.Mapper
 import com.urban.androidhomework.preferences.PreferencesRepository
-import com.urban.androidhomework.utils.SAVED_INSTANCE_KEY
-import com.urban.androidhomework.utils.launchActivity
-import com.urban.androidhomework.utils.showErrorToastToUser
+import com.urban.androidhomework.room.CartoonData
+import com.urban.androidhomework.utils.*
 import com.urban.androidhomework.viewModel.CharacterViewModel
 import kotlinx.android.synthetic.main.activity_main.*
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
@@ -29,6 +36,23 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var preferencesRepository: PreferencesRepository
+
+    @Inject
+    lateinit var mapper: Mapper
+
+    private lateinit var calendar: Calendar
+
+    private var dateListener = DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+        calendar.set(Calendar.YEAR, year)
+        calendar.set(Calendar.MONTH, monthOfYear)
+        calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+        updateFilterCondition()
+    }
+
+    private fun updateFilterCondition() {
+        val sdf = SimpleDateFormat(Utils.OUTPUT_FORMAT, Locale.getDefault())
+        tvDate.text = sdf.format(calendar.time)
+    }
 
     private val adapter: CharactersAdapter by lazy {
         CharactersAdapter(characterListener)
@@ -56,7 +80,10 @@ class MainActivity : AppCompatActivity() {
             adapter.submitList(characters)
         }
 
+        calendar = Calendar.getInstance()
+
         setUpRV()
+        initClickListeners()
         initObservers()
     }
 
@@ -72,6 +99,32 @@ class MainActivity : AppCompatActivity() {
         rvCharacters.adapter = adapter
     }
 
+    private fun initClickListeners() {
+        clFilterLogic.setOnClickListener(object : OnTimeClickListener() {
+            override fun oneTimeClick(view: View) {
+                DatePickerDialog(this@MainActivity,
+                        dateListener,
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH),
+                        calendar.get(Calendar.DAY_OF_MONTH)).show()
+            }
+        })
+
+        ivDone.setOnClickListener(object : OnTimeClickListener() {
+            override fun oneTimeClick(view: View) {
+                if (tvDate.text.isNullOrEmpty()) {
+                    characterViewModel.filterConditionError.value = getString(R.string.txt_filter_condition_error_label)
+                } else {
+                    val date: Long = Utils.longForOutPut(tvDate.text.toString().trimEnd())
+                    characterViewModel.filterCartoonsFromDB(date)
+                    characterViewModel.progress.value = true
+                    tvDate.text = ""
+                    adapter.submitList(null)
+                }
+            }
+        })
+    }
+
     override fun onStart() {
         super.onStart()
         val index = preferencesRepository.index
@@ -84,6 +137,8 @@ class MainActivity : AppCompatActivity() {
 
         characterViewModel.mutableCharacters.observe(this, Observer {
             adapter.submitList(it)
+            characterViewModel.addCartoons2DB(getCartoons(it))
+            characterViewModel.addEvent.value = true
         })
 
         characterViewModel.errorEvent.observe(this, Observer {
@@ -93,6 +148,51 @@ class MainActivity : AppCompatActivity() {
         characterViewModel.progress.observe(this, Observer {
             progressBar.isVisible = it
         })
+
+        characterViewModel.filterConditionError.observe(this, Observer {
+            showErrorToastToUser(it)
+        })
+
+        characterViewModel.filteredCartoons.observe(this, Observer {
+            if (it.isNullOrEmpty()) {
+                Handler(Looper.getMainLooper()).postDelayed({
+                    showErrorToastToUser(getString(R.string.txt_no_result_try_it_again_label))
+                    characterViewModel.getAllCharacters()
+                }, 500L)
+            } else {
+                updateUI(it)
+            }
+        })
+
+        characterViewModel.addEvent.observe(this, Observer {
+            if (it){
+                characterViewModel.getCartoons()
+            }
+        })
+
+        characterViewModel.cartoons.observe(this, Observer {
+            it.forEach {
+                Log.d(TAG, "MY: $it")
+            }
+        })
+    }
+
+    private fun getCartoons(data: List<CharacterData>): MutableList<CartoonData> {
+        val cartoons = mutableListOf<CartoonData>()
+        data.forEach { character ->
+            cartoons.add(mapper.mapCharacterData2CartoonData(character))
+        }
+        return cartoons
+    }
+
+    private fun updateUI(list: MutableList<CartoonData>) {
+        Log.d(TAG, "updateUI()")
+        val data = mutableListOf<CharacterData>()
+        list.forEach { cartoon ->
+            data.add(mapper.mapCartoonData2CharacterData(cartoon))
+        }
+        adapter.submitList(data)
+        adapter.notifyDataSetChanged()
     }
 
     companion object {

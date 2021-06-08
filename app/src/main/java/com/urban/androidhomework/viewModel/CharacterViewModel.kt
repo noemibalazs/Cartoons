@@ -9,13 +9,21 @@ import com.urban.androidhomework.api.model.CharacterData
 import com.urban.androidhomework.api.model.CharacterLocation
 import com.urban.androidhomework.api.model.LocationDetails
 import com.urban.androidhomework.api.remoteDataSource.NetworkService
+import com.urban.androidhomework.local.LocalDataService
+import com.urban.androidhomework.room.CartoonData
+import com.urban.androidhomework.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class CharacterViewModel @Inject constructor(private val networkService: NetworkService) : BaseCharacterViewModel() {
+class CharacterViewModel @Inject constructor(private val networkService: NetworkService,
+                                             private val localDataService: LocalDataService) : BaseCharacterViewModel() {
 
     override val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
@@ -23,6 +31,11 @@ class CharacterViewModel @Inject constructor(private val networkService: Network
     val mutableCharacter = MutableLiveData<CharacterData>()
     val mutableLocationDetails = MutableLiveData<LocationDetails?>()
     val mutableCharacterLocation = MutableLiveData<CharacterLocation>()
+    val filterConditionError = MutableLiveData<String>()
+    val filteredCartoons = MutableLiveData<MutableList<CartoonData>>()
+
+    val addEvent = MutableLiveData<Boolean>()
+    val cartoons = MutableLiveData<MutableList<CartoonData>>()
 
     fun getAllCharacters() {
         compositeDisposable.clear()
@@ -40,6 +53,9 @@ class CharacterViewModel @Inject constructor(private val networkService: Network
                     override fun onSuccess(character: Character) {
                         mutableCharacters.value = character.results
                         Log.d(TAG, "getAllCharacters onSuccess() - size: ${character.results.size}")
+                        character.results.forEach {
+                            Log.d(TAG, "Character is: $it")
+                        }
                     }
 
                     override fun onError(e: Throwable) {
@@ -101,10 +117,49 @@ class CharacterViewModel @Inject constructor(private val networkService: Network
         compositeDisposable.add(disposable)
     }
 
+    fun addCartoons2DB(list: MutableList<CartoonData>) {
+        Log.d(TAG, "addCartoons2DB()")
+        CoroutineScope(Dispatchers.IO).launch {
+            localDataService.addCartoonList(list)
+        }
+    }
+
+    fun filterCartoonsFromDB(date: Long) {
+        Log.d(TAG, "filterCartoonsFromDB()")
+        progress.value = true
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = localDataService.filteredCartoons(date)
+            withContext(Dispatchers.Main) {
+                try {
+                    filteredCartoons.value = result
+                    progress.value = false
+                } catch (e: Exception) {
+                    progress.value = false
+                    errorEvent.value = e.message ?: ERROR_MESSAGE
+                    Log.e(TAG, "${e.printStackTrace()}")
+                }
+            }
+        }
+    }
+
+    fun getCartoons(){
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = localDataService.getCartoons()
+            withContext(Dispatchers.Main){
+                try {
+                    cartoons.value = result
+                }catch (e: Exception){
+                    Log.e(TAG, "${e.printStackTrace()}")
+                }
+            }
+        }
+    }
+
     @Suppress("UNCHECKED_CAST")
-    class Factory(private val networkService: NetworkService) : ViewModelProvider.Factory {
+    class Factory(private val networkService: NetworkService,
+                  private val localDataService: LocalDataService) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return CharacterViewModel(networkService) as T
+            return CharacterViewModel(networkService, localDataService) as T
         }
     }
 

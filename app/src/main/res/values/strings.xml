@@ -8,4 +8,8 @@
     <string name="txt_gender_label">Gender: %s</string>
     <string name="txt_type_label">Type: %s</string>
     <string name="txt_dimension_label">Dimension: %s</string>
+    <string name="txt_filter_by_label">Filter by:</string>
+    <string name="txt_search_hint_label">12/06/2012</string>
+    <string name="txt_filter_condition_error_label">The filter condition should not be empty!</string>
+    <string name="txt_no_result_try_it_again_label">Hm..no results, try with another date!</string>
 </resources>

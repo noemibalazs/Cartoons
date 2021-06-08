@@ -6,7 +6,7 @@ import com.urban.androidhomework.api.model.LocationDetails
 import io.reactivex.Single
 
 interface NetworkService {
-    fun getAllCharacters(): Single<Character>
+    fun getAllCharacters(page:Int): Single<Character>
 
     fun getCharacter(id: Int): Single<CharacterData>
 

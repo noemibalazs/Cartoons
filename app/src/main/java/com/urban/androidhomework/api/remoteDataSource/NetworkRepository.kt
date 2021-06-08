@@ -11,8 +11,8 @@ import javax.inject.Singleton
 @Singleton
 class NetworkRepository @Inject constructor(private val networkApi: NetworkApi) : NetworkService {
 
-    override fun getAllCharacters(): Single<Character> {
-        return networkApi.getAllCharacters()
+    override fun getAllCharacters(page:Int): Single<Character> {
+        return networkApi.getAllCharacters(page)
     }
 
     override fun getCharacter(id: Int): Single<CharacterData> {

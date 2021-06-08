@@ -34,13 +34,13 @@ class CharacterViewModel @Inject constructor(private val networkService: Network
     val filterConditionError = MutableLiveData<String>()
     val filteredCartoons = MutableLiveData<MutableList<CartoonData>>()
 
-    val addEvent = MutableLiveData<Boolean>()
-    val cartoons = MutableLiveData<MutableList<CartoonData>>()
+    var pageIndex = 1
+    private val allResults = mutableListOf<CharacterData>()
 
     fun getAllCharacters() {
+        Log.d(TAG, "getAllCharacters()")
         compositeDisposable.clear()
-
-        val disposable = networkService.getAllCharacters()
+        val disposable = networkService.getAllCharacters(pageIndex)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe {
@@ -51,11 +51,14 @@ class CharacterViewModel @Inject constructor(private val networkService: Network
                 }
                 .subscribeWith(object : DisposableSingleObserver<Character>() {
                     override fun onSuccess(character: Character) {
-                        mutableCharacters.value = character.results
-                        Log.d(TAG, "getAllCharacters onSuccess() - size: ${character.results.size}")
-                        character.results.forEach {
-                            Log.d(TAG, "Character is: $it")
+                        if (pageIndex < 6) {
+                            allResults.addAll(character.results)
+                            pageIndex++
+                            getAllCharacters()
+                        } else {
+                            mutableCharacters.value = allResults
                         }
+                        Log.d(TAG, "getAllCharacters onSuccess() - pageIndex: $pageIndex")
                     }
 
                     override fun onError(e: Throwable) {
@@ -67,6 +70,7 @@ class CharacterViewModel @Inject constructor(private val networkService: Network
     }
 
     fun getCharacterDetails(id: Int) {
+        Log.d(TAG, "getCharacterDetails()")
         compositeDisposable.clear()
         val disposable = networkService.getCharacter(id).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -93,6 +97,7 @@ class CharacterViewModel @Inject constructor(private val networkService: Network
     }
 
     fun getLocationDetails(id: Int) {
+        Log.d(TAG, "getLocationDetails()")
         compositeDisposable.clear()
         val disposable = networkService.getLocationDetails(id)
                 .subscribeOn(Schedulers.io())
@@ -136,19 +141,6 @@ class CharacterViewModel @Inject constructor(private val networkService: Network
                 } catch (e: Exception) {
                     progress.value = false
                     errorEvent.value = e.message ?: ERROR_MESSAGE
-                    Log.e(TAG, "${e.printStackTrace()}")
-                }
-            }
-        }
-    }
-
-    fun getCartoons(){
-        CoroutineScope(Dispatchers.IO).launch {
-            val result = localDataService.getCartoons()
-            withContext(Dispatchers.Main){
-                try {
-                    cartoons.value = result
-                }catch (e: Exception){
                     Log.e(TAG, "${e.printStackTrace()}")
                 }
             }

@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
     private val characterListener: CharacterListener = { id, index ->
         preferencesRepository.index = index
         launchCharacterDetails(id)
-        Log.d(TAG, "RV index: $index - id: $id")
+        Log.d(TAG, "Recycle view index: $index - id: $id")
     }
 
     private fun launchCharacterDetails(id: Int) {
@@ -138,7 +138,6 @@ class MainActivity : AppCompatActivity() {
         characterViewModel.mutableCharacters.observe(this, Observer {
             adapter.submitList(it)
             characterViewModel.addCartoons2DB(getCartoons(it))
-            characterViewModel.addEvent.value = true
         })
 
         characterViewModel.errorEvent.observe(this, Observer {
@@ -161,18 +160,6 @@ class MainActivity : AppCompatActivity() {
                 }, 500L)
             } else {
                 updateUI(it)
-            }
-        })
-
-        characterViewModel.addEvent.observe(this, Observer {
-            if (it){
-                characterViewModel.getCartoons()
-            }
-        })
-
-        characterViewModel.cartoons.observe(this, Observer {
-            it.forEach {
-                Log.d(TAG, "MY: $it")
             }
         })
     }

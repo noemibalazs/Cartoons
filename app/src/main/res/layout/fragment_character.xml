@@ -8,6 +8,7 @@
     android:fillViewport="true"
     android:isScrollContainer="true"
     android:overScrollMode="never"
+    android:id="@+id/nsvDetails"
     tools:context=".details.CharacterFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout

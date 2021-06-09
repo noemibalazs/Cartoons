@@ -11,7 +11,6 @@ import com.urban.androidhomework.api.model.LocationDetails
 import com.urban.androidhomework.api.remoteDataSource.NetworkService
 import com.urban.androidhomework.local.LocalDataService
 import com.urban.androidhomework.room.CartoonData
-import com.urban.androidhomework.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableSingleObserver

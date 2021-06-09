@@ -11,13 +11,11 @@ import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.urban.androidhomework.R
 import com.urban.androidhomework.api.model.CharacterData
-import com.urban.androidhomework.api.model.CharacterLocation
 import com.urban.androidhomework.api.model.LocationDetails
 import com.urban.androidhomework.app.UrbanHomeWorkApp
 import com.urban.androidhomework.utils.showErrorToastToUser
 import com.urban.androidhomework.viewModel.CharacterViewModel
 import kotlinx.android.synthetic.main.fragment_character.*
-import java.util.regex.Pattern
 import javax.inject.Inject
 
 class CharacterFragment : Fragment() {

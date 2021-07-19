@@ -1,21 +1,10 @@
 package com.urban.androidhomework.utils
 
-import com.urban.androidhomework.api.model.Character
-import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
 
 class Utils {
     companion object {
-        fun getName(characterResponse: Response<Character>): List<String> {
-            val names = mutableListOf<String>()
-            for (ch in characterResponse.body()!!.results) {
-                names.add(ch.name)
-            }
-
-            return names
-        }
-
         private const val INPUT_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
         const val OUTPUT_FORMAT = "dd-MM-yyyy"
 

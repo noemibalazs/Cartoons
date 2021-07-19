@@ -1,10 +1,9 @@
-package com.urban.androidhomework.adapter.vh
+package com.urban.androidhomework.adapter
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.urban.androidhomework.R
-import com.urban.androidhomework.adapter.adapter.CharacterListener
 import com.urban.androidhomework.api.model.CharacterData
 import com.urban.androidhomework.utils.OnTimeClickListener
 import kotlinx.android.synthetic.main.item_character.view.*

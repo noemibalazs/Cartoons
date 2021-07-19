@@ -1,4 +1,4 @@
-package com.urban.androidhomework.adapter.util
+package com.urban.androidhomework.adapter
 
 import androidx.recyclerview.widget.DiffUtil
 import com.urban.androidhomework.api.model.CharacterData

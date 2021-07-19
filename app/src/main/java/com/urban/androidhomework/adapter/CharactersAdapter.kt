@@ -1,11 +1,9 @@
-package com.urban.androidhomework.adapter.adapter
+package com.urban.androidhomework.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.urban.androidhomework.R
-import com.urban.androidhomework.adapter.util.CharacterDifUtil
-import com.urban.androidhomework.adapter.vh.CharacterVH
 import com.urban.androidhomework.api.model.CharacterData
 
 typealias CharacterListener = (id: Int, index: Int) -> Unit

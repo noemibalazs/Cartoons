@@ -9,9 +9,9 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import androidx.test.platform.app.InstrumentationRegistry
-import com.urban.androidhomework.adapter.adapter.CharacterListener
-import com.urban.androidhomework.adapter.adapter.CharactersAdapter
-import com.urban.androidhomework.adapter.vh.CharacterVH
+import com.urban.androidhomework.adapter.CharacterListener
+import com.urban.androidhomework.adapter.CharacterVH
+import com.urban.androidhomework.adapter.CharactersAdapter
 import com.urban.androidhomework.api.model.CharacterData
 import com.urban.androidhomework.api.model.CharacterLocation
 import com.urban.androidhomework.landing.MainActivity

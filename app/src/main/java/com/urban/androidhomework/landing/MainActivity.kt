@@ -11,8 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import com.urban.androidhomework.R
-import com.urban.androidhomework.adapter.adapter.CharacterListener
-import com.urban.androidhomework.adapter.adapter.CharactersAdapter
+import com.urban.androidhomework.adapter.CharacterListener
+import com.urban.androidhomework.adapter.CharactersAdapter
 import com.urban.androidhomework.api.model.CharacterData
 import com.urban.androidhomework.app.UrbanHomeWorkApp
 import com.urban.androidhomework.details.CharacterDetailActivity
